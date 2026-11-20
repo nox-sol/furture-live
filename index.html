@@ -160,4 +160,217 @@
       renderArticleList();
       if (allArticles.length > 0) {
         selectArticle(allArticles.at(0));
+           }
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if ((cat === '全部' && btn.textContent.includes('全部')) || btn.textContent === cat) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      renderArticleList();
+    }
+
+    function renderArticleList() {
+      const listEl = document.getElementById('articleList');
+      const filtered = currentCategory === '全部' ? allArticles : allArticles.filter(a => a.category === currentCategory);
+      document.getElementById('articleCount').textContent = filtered.length;
+      listEl.innerHTML = filtered.map(art => `
+        <div onclick='selectArticleById("${art.id}")' class="art-card ${currentArticle && currentArticle.id === art.id ? 'active' : ''}">
+          <div class="art-meta">
+            <span class="tag">${art.category}</span>
+            <span>${art.source} · ${art.date}</span>
+          </div>
+          <h3>${art.title_en}</h3>
+          <p>${art.title_zh}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectArticleById(id) {
+      const found = allArticles.find(a => a.id === id);
+      if (found) selectArticle(found);
+    }
+
+    function selectArticle(art) {
+      currentArticle = art;
+      renderArticleList();
+      renderPaper();
+    }
+
+    function renderPaper() {
+      if (!currentArticle) return;
+      const paper = document.getElementById('articlePaper');
+      const levelData = currentArticle.levels[currentLevel] || currentArticle.levels['B1'];
+      const sentencesHtml = levelData.sentences.map((s, idx) => {
+        const wordsHtml = s.en.split(/(\s+)/).map(part => {
+          const clean = part.replace(/[^a-zA-Z'-]/g, '').toLowerCase();
+          if (clean.length > 0) {
+            return `<span class="word-btn" onclick="lookupWord('${clean}')">${part}</span>`;
+          }
+          return part;
+        }).join('');
+
+        return `
+          <div id="sent-${idx}" class="sentence-row">
+            <button class="speak-btn" onclick="speakSentence(${idx}, \`${s.en.replace(/`/g, "'").replace(/"/g, '&quot;')}\`)" title="朗讀此句">🔊</button>
+            <div style="flex:1;">
+              <p class="en-text">${wordsHtml}</p>
+              ${showTranslation ? `<p class="zh-text">${s.zh}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      paper.innerHTML = `
+        <div class="paper-header">
+          <div style="display:flex; justify-content:space-between; font-size:12px; color:#6b7280;">
+            <span class="tag">${currentArticle.category}</span>
+            <span>來源：${currentArticle.source} ｜ 日期：${currentArticle.date}</span>
+          </div>
+          <h2>${currentArticle.title_en}</h2>
+          <p class="zh-title">${currentArticle.title_zh}</p>
+        </div>
+
+        <div class="controls">
+          <div class="lvl-group">
+            <span style="font-size:12px; font-weight:700; color:#6b7280;">難度：</span>
+            ${['A2', 'B1', 'B2'].map(lvl => `
+              <button onclick="setLevel('${lvl}')" class="lvl-btn ${currentLevel === lvl ? 'active' : ''}">${lvl}</button>
+            `).join('')}
+          </div>
+          <div class="tool-group">
+            <button onclick="toggleRate()" class="tool-btn">🐢 語速：${speechRate}x</button>
+            <button onclick="toggleTrans()" class="tool-btn">${showTranslation ? '👁️ 隱藏中文' : '👁️ 顯示中文'}</button>
+          </div>
+        </div>
+
+        <div>${sentencesHtml}</div>
+      `;
+    }
+
+    function setLevel(lvl) { currentLevel = lvl; renderPaper(); }
+    function toggleTrans() { showTranslation = !showTranslation; renderPaper(); }
+    function toggleRate() { speechRate = speechRate === 1.0 ? 0.75 : 1.0; renderPaper(); }
+
+    function speakSentence(idx, text) {
+      window.speechSynthesis.cancel();
+      document.querySelectorAll('[id^="sent-"]').forEach(el => el.classList.remove('sentence-active'));
+      const el = document.getElementById('sent-' + idx);
+      if (el) el.classList.add('sentence-active');
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.rate = speechRate;
+      utter.onend = () => { if (el) el.classList.remove('sentence-active'); };
+      window.speechSynthesis.speak(utter);
+    }
+
+    function lookupWord(word) {
+      const dict = (currentArticle && currentArticle.dictionary) || {};
+      const meaning = dict[word] || dict[word.replace(/s$/, '')] || dict[word.replace(/ed$/, '')] || dict[word.replace(/ing$/, '')] || '（點擊發音聽讀音，可加入單字庫複習）';
+      selectedWord = { word, meaning };
+      document.getElementById('popupWord').textContent = word;
+      document.getElementById('popupMeaning').textContent = meaning;
+      document.getElementById('wordPopup').classList.remove('hidden');
+      speakWord();
+    }
+
+    function closeWordPopup() { document.getElementById('wordPopup').classList.add('hidden'); }
+    function speakWord() {
+      if (!selectedWord.word) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(selectedWord.word);
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u);
+    }
+
+    function saveCurrentWord() {
+      if (!selectedWord.word) return;
+      if (!savedVocab.some(v => v.word === selectedWord.word)) {
+        savedVocab.unshift({ ...selectedWord, date: new Date().toISOString().slice(0, 10) });
+        localStorage.setItem('eco_vocab', JSON.stringify(savedVocab));
+        updateVocabCount();
+        alert(`已將「${selectedWord.word}」加入單字庫！`);
       } else {
+        alert('這個單字已經在你的單字庫裡囉！');
+      }
+    }
+
+    function updateVocabCount() { document.getElementById('vocabCount').textContent = savedVocab.length; }
+
+    function showView(view) {
+      document.getElementById('readerView').classList.toggle('hidden', view !== 'reader');
+      document.getElementById('vocabView').classList.toggle('hidden', view !== 'vocab');
+      if (view === 'vocab') renderVocabList();
+    }
+
+    function renderVocabList() {
+      const container = document.getElementById('vocabList');
+      if (savedVocab.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#9ca3af; padding:40px 0;">目前還沒有收藏任何單字，閱讀文章時點擊英文單字即可收藏！</p>';
+        return;
+      }
+      container.innerHTML = savedVocab.map((v, i) => `
+        <div class="vocab-item">
+          <div>
+            <strong style="font-size:17px; color:#065f46; margin-right:8px;">${v.word}</strong>
+            <span style="font-size:14px; color:#4b5563;">${v.meaning}</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button onclick="speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance('${v.word}'), {lang:'en-US'}))" style="background:#d1fae5; color:#065f46; padding:4px 10px; font-size:12px;">🔊</button>
+            <button onclick="removeVocab(${i})" style="background:#fee2e2; color:#dc2626; padding:4px 10px; font-size:12px;">刪除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function removeVocab(idx) {
+      savedVocab.splice(idx, 1);
+      localStorage.setItem('eco_vocab', JSON.stringify(savedVocab));
+      updateVocabCount();
+      renderVocabList();
+    }
+
+    function exportCSV() {
+      if (savedVocab.length === 0) return alert('單字庫目前是空的喔！');
+      const rows = [['單字', '中文解釋', '收藏日期'], ...savedVocab.map(v => [v.word, v.meaning, v.date])];
+      const csv = '\uFEFF' + rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'my_eco_vocabulary.csv';
+      a.click();
+    }
+
+    function openImportModal() { document.getElementById('importModal').classList.remove('hidden'); }
+    function closeImportModal() { document.getElementById('importModal').classList.add('hidden'); }
+
+    function handleImport() {
+      try {
+        const raw = document.getElementById('importJsonInput').value.trim();
+        const obj = JSON.parse(raw);
+        if (!obj.title_en || !obj.levels) throw new Error('格式不符');
+        obj.id = 'custom_' + Date.now();
+        obj.date = obj.date || new Date().toISOString().slice(0, 10);
+        const localArticles = JSON.parse(localStorage.getItem('eco_custom_articles') || '[]');
+        localArticles.unshift(obj);
+        localStorage.setItem('eco_custom_articles', JSON.stringify(localArticles));
+        allArticles.unshift(obj);
+        renderArticleList();
+        selectArticle(obj);
+        document.getElementById('importJsonInput').value = '';
+        closeImportModal();
+        alert('成功匯入新文章！');
+      } catch (e) {
+        alert('JSON 格式有誤，請確認是否完整複製了 AI 產生的代碼！');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
