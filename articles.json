@@ -1,0 +1,112 @@
+[
+  {
+    "id": "demo_2026_01",
+    "date": "2026-11-20",
+    "source": "BBC",
+    "url": "https://bbc.com",
+    "category": "綠色能源與環保科技",
+    "title_en": "Solar Panels Floating on Reservoirs Could Power Millions of Homes",
+    "title_zh": "水庫上的浮動太陽能板可為數百萬戶家庭供電",
+    "levels": {
+      "A2": {
+        "sentences": [
+          {
+            "en": "Scientists found a smart way to make clean energy.",
+            "zh": "科學家找到了一種製造潔淨能源的聰明方法。"
+          },
+          {
+            "en": "They put solar panels on top of water in reservoirs.",
+            "zh": "他們將太陽能板放置在水庫的水面上。"
+          },
+          {
+            "en": "The cool water keeps the panels from getting too hot.",
+            "zh": "涼爽的水能防止太陽能板變得過熱。"
+          },
+          {
+            "en": "This helps them make more electricity and saves land for farming.",
+            "zh": "這有助於它們產生更多電力，並為農業節省土地。"
+          }
+        ]
+      },
+      "B1": {
+        "sentences": [
+          {
+            "en": "Floating solar farms are becoming a popular solution for clean electricity.",
+            "zh": "浮動式太陽能發電場正成為潔淨電力的熱門解決方案。"
+          },
+          {
+            "en": "By placing panels on man-made reservoirs, countries can save valuable land.",
+            "zh": "透過將太陽能板放置在人工水庫上，各國可以節省寶貴的土地。"
+          },
+          {
+            "en": "Furthermore, the panels reduce water evaporation during hot summer months.",
+            "zh": "此外，這些太陽能板還能減少炎熱夏季期間的水分蒸發。"
+          },
+          {
+            "en": "Researchers estimate this technology could supply power to millions of households worldwide.",
+            "zh": "研究人員估計，這項技術可以為全球數百萬戶家庭提供電力。"
+          }
+        ]
+      },
+      "B2": {
+        "sentences": [
+          {
+            "en": "Deploying floating photovoltaic systems on existing reservoirs offers a dual environmental benefit.",
+            "zh": "在現有水庫上部署浮動式太陽能光電系統能帶來雙重的環境效益。"
+          },
+          {
+            "en": "Not only does it generate renewable energy without competing for agricultural land, but it also curbs water loss.",
+            "zh": "它不僅能在不與農地競爭的情況下產生再生能源，還能抑制水資源流失。"
+          },
+          {
+            "en": "The cooling effect of the water underneath significantly boosts the efficiency of the solar cells.",
+            "zh": "下方水體的冷卻效應顯著提升了太陽能電池的轉換效率。"
+          },
+          {
+            "en": "Experts believe scaling up this infrastructure is crucial for meeting global carbon neutrality targets.",
+            "zh": "專家認為，擴大這項基礎設施的規模對於實現全球碳中和目標至關重要。"
+          }
+        ]
+      }
+    },
+    "dictionary": {
+      "scientists": "(n.) 科學家",
+      "found": "(v.) 發現（find 的過去式）",
+      "smart": "(adj.) 聰明的、智慧的",
+      "clean": "(adj.) 乾淨的、潔淨的",
+      "energy": "(n.) 能源、能量",
+      "solar": "(adj.) 太陽能的",
+      "panels": "(n.) 面板、嵌板",
+      "reservoirs": "(n.) 水庫、蓄水池",
+      "electricity": "(n.) 電力",
+      "farming": "(n.) 農業、耕作",
+      "floating": "(adj.) 漂浮的、浮動的",
+      "solution": "(n.) 解決方案",
+      "valuable": "(adj.) 寶貴的、有價值的",
+      "furthermore": "(adv.) 此外、而且",
+      "reduce": "(v.) 減少、降低",
+      "evaporation": "(n.) 蒸發",
+      "researchers": "(n.) 研究人員",
+      "estimate": "(v.) 估計、預估",
+      "technology": "(n.) 科技、技術",
+      "supply": "(v.) 供應、提供",
+      "households": "(n.) 家庭、家戶",
+      "worldwide": "(adv.) 在世界各地、全球地",
+      "deploying": "(v.) 部署、配置",
+      "photovoltaic": "(adj.) 光電的",
+      "existing": "(adj.) 現有的、既有的",
+      "dual": "(adj.) 雙重的",
+      "environmental": "(adj.) 環境的",
+      "benefit": "(n.) 益處、效益",
+      "renewable": "(adj.) 可再生的",
+      "agricultural": "(adj.) 農業的",
+      "curbs": "(v.) 抑制、控制",
+      "significantly": "(adv.) 顯著地、大幅地",
+      "boosts": "(v.) 提升、促進",
+      "efficiency": "(n.) 效率",
+      "crucial": "(adj.) 至關重要的",
+      "neutrality": "(n.) 中和、中立",
+      "targets": "(n.) 目標"
+    }
+  }
+]
