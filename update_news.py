@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import time
 import urllib.request
@@ -15,6 +16,22 @@ RSS_FEEDS = [
 
 KEYWORDS = ["climate", "green", "energy", "solar", "wind", "carbon", "emission", "nature", "wildlife", "ocean", "plastic", "recycle", "sustainab", "environment", "warming", "ev", "electric", "forest", "water", "net zero", "planet", "pollution", "biodiversity", "coal", "fossil"]
 
+def fetch_full_article_text(url):
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            html = resp.read().decode('utf-8', errors='ignore')
+        paragraphs = re.findall(r'<p[^>]*>(.*?)</p>', html, flags=re.DOTALL)
+        clean_paras = []
+        for p in paragraphs:
+            text = re.sub(r'<[^>]+>', '', p).strip()
+            if len(text) > 45 and "BBC" not in text and "cookie" not in text.lower():
+                clean_paras.append(text)
+        return "\n".join(clean_paras[:25])
+    except Exception as e:
+        print(f"Full text fetch warning: {e}")
+        return ""
+
 def fetch_rss():
     items = []
     for source, url in RSS_FEEDS:
@@ -29,30 +46,38 @@ def fetch_rss():
                 desc = item.findtext('description') or ''
                 text_check = (title + " " + desc).lower()
                 if any(k in text_check for k in KEYWORDS):
-                    items.append({"source": source, "title": title.strip(), "link": link.strip(), "desc": desc.strip()})
+                    full_text = fetch_full_article_text(link.strip())
+                    items.append({
+                        "source": source,
+                        "title": title.strip(),
+                        "link": link.strip(),
+                        "desc": desc.strip(),
+                        "full_text": full_text if len(full_text) > 200 else desc.strip()
+                    })
         except Exception as e:
             print(f"Error fetching {source}: {e}")
     return items
 
 def generate_article_data(raw_item):
     prompt = f"""
-    你是一位專業的英語教學與環境永續新聞主編。請將以下新聞改寫為適合台灣學習者的「完整長篇」英語閱讀教材，並嚴格依照歐洲共同語言參考標準（CEFR）分級為 A2、B1、B2 三種難度。
+    你是一位專業的英語教學與環境永續新聞主編。請根據以下新聞的完整內容，改寫為「內容豐富、篇幅完整」的深度英語閱讀教材，並嚴格依照 CEFR 標準分為 A2、B1、B2 三種難度。
     
     新聞來源：{raw_item['source']}
     原始標題：{raw_item['title']}
-    原始摘要：{raw_item['desc']}
+    完整新聞內容：
+    {raw_item['full_text']}
     
-    【重要寫作與分級要求】：
-    1. **不限字數，內容務必豐富完整**：請根據該新聞主題的完整脈絡，擴寫並呈現充足的背景資訊、成因分析、具體數據案例、各方觀點與未來影響，讓每個難度等級都是一篇結構完整、有深度且讀起來過癮的長篇文章（不要只寫短短幾句話的摘要）。
-    2. **嚴格依照 CEFR 程度分級**：
-       - **A2（基礎級）**：使用高頻基礎單字與簡單清晰的句型（以簡單句與基本連接詞為主），把複雜的環境概念用淺顯易懂的方式完整說明。
-       - **B1（進階級）**：使用標準新聞英語詞彙、適度的複合句與轉折詞，完整傳達新聞細節與因果邏輯。
-       - **B2（高階級）**：使用道地精準的學術與新聞專業詞彙、多元進階句型（如分詞構句、關係子句、被動與假設語氣），展現深度報導的專業語氣。
-    3. **逐句對照**：每個等級都必須拆分成獨立的英文句子，並附上自然流暢的繁體中文（台灣用語）翻譯。
-    4. **主題分類**：從以下四項中選出最貼切的一個：「氣候變遷與環境現況」、「永續生活與環保行動」、「國家政策與能源挑戰」、「綠色能源與環保科技」。
-    5. **內建單字庫**：從 A2、B1、B2 三個版本的文章中，提取所有重要或值得學習的英文單字（全部轉為小寫，至少 40～60 個單字），提供繁體中文詞性與解釋。
+    【強制寫作與難度分級規範（務必嚴格遵守）】：
+    1. **篇幅要長、細節要完整**：每個難度等級（A2、B1、B2）**至少必須包含 14 到 20 個完整英文句子**（不限字數上限，越完整越好），請把新聞中的起因、數據、地點、人物觀點、環境衝擊與解決方案全部寫出來，絕對禁止只寫 4、5 句的短摘要！
+    2. **讓 A2 / B1 / B2 產生極明顯的難易度落差**：
+       - **A2（基礎入門級）**：只使用最基礎的 1500 個日常英文單字，每句話控制在 8～13 個字以內的簡單短句（例如使用 because, so, but, when），把複雜新聞拆解成極度好懂的白話短句。
+       - **B1（中級進階級）**：使用高中與多益標準新聞字彙，每句約 15～22 個字，運用關係代名詞（which, who, that）、現在完成式與轉折連接詞（however, therefore, meanwhile），呈現流暢的新聞敘事。
+       - **B2（高階專業級）**：使用《經濟學人》或托福/雅思等級的進階學術與環境專業詞彙（如 mitigate, unprecedented, biodiversity, implementation, infrastructure），每句約 22～32 個字，大量運用分詞構句、倒裝、被動語態與複雜從屬子句，展現高度專業的新聞分析語氣。
+    3. **逐句對照翻譯**：每一個英文句子都必須搭配精準、道地的繁體中文（台灣習慣用語）翻譯。
+    4. **主題分類**：從「氣候變遷與環境現況」、「永續生活與環保行動」、「國家政策與能源挑戰」、「綠色能源與環保科技」中選最貼切的一項。
+    5. **豐富單字庫**：從三篇文章中提取至少 50 個重要英文單字（全部小寫），提供繁體中文詞性與解釋。
     
-    請嚴格只輸出純 JSON 格式（不要包含 markdown 標記或其他多餘說明文字），格式如下：
+    請嚴格只輸出純 JSON 格式（不要包含 markdown 標記或其他說明文字），格式如下：
     {{
       "id": "news_{int(time.time())}",
       "date": "{datetime.now().strftime('%Y-%m-%d')}",
@@ -71,7 +96,7 @@ def generate_article_data(raw_item):
     }}
     """
     available = [m.name for m in client.models.list() if "flash" in m.name.lower()]
-    chosen_model = available if available else "gemini-2.0-flash"
+    chosen_model = available.pop(0) if available else "gemini-2.0-flash"
     response = client.models.generate_content(
         model=chosen_model,
         contents=prompt,
