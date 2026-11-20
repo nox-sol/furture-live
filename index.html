@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoRead Daily｜每日永續英文閱讀</title>
+  <script src="https://tailwindcss.com"></script>
+  <style>
+    body { background-color: #f4f7f5; color: #1f2937; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif; }
+    .word-btn { cursor: pointer; border-radius: 4px; padding: 0 2px; transition: background-color 0.15s; }
+    .word-btn:hover { background-color: #d1fae5; color: #065f46; }
+    .sentence-active { background-color: #ecfdf5; border-left: 4px solid #10b981; padding-left: 12px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- 頂部導覽列 -->
+  <header class="bg-emerald-800 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="showView('reader')">
+        <span class="text-2xl">🌱</span>
+        <div>
+          <h1 class="font-bold text-lg tracking-wide">EcoRead Daily</h1>
+          <p class="text-xs text-emerald-200">每日永續與氣候變遷英文閱讀</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openImportModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-3 py-1.5 rounded-lg font-medium transition">
+          ＋ 匯入新文章
+        </button>
+        <button onclick="showView('vocab')" class="bg-amber-500 hover:bg-amber-400 text-emerald-950 text-sm px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
+          📖 我的單字庫 (<span id="vocabCount">0</span>)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容區：閱讀器 -->
+  <main id="readerView" class="max-w-5xl w-full mx-auto px-4 py-6 flex-1">
+    <!-- 主題篩選列 -->
+    <div class="flex flex-wrap gap-2 mb-4" id="categoryTabs">
+      <button onclick="setCategory('全部')" class="cat-btn bg-emerald-700 text-white px-3 py-1.5 rounded-full text-sm font-medium">全部主題</button>
+      <button onclick="setCategory('氣候變遷與環境現況')" class="cat-btn bg-white text-gray-700 hover:bg-emerald-50 px-3 py-1.5 rounded-full text-sm border">氣候變遷與環境現況</button>
+      <button onclick="setCategory('永續生活與環保行動')" class="cat-btn bg-white text-gray-700 hover:bg-emerald-50 px-3 py-1.5 rounded-full text-sm border">永續生活與環保行動</button>
+      <button onclick="setCategory('國家政策與能源挑戰')" class="cat-btn bg-white text-gray-700 hover:bg-emerald-50 px-3 py-1.5 rounded-full text-sm border">國家政策與能源挑戰</button>
+      <button onclick="setCategory('綠色能源與環保科技')" class="cat-btn bg-white text-gray-700 hover:bg-emerald-50 px-3 py-1.5 rounded-full text-sm border">綠色能源與環保科技</button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 左側：文章列表 -->
+      <div class="lg:col-span-1 space-y-3">
+        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider">每日精選報導 (<span id="articleCount">0</span>)</h2>
+        <div id="articleList" class="space-y-2.5 max-h-[75vh] overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- 右側：A4 閱讀紙 -->
+      <div class="lg:col-span-2">
+        <div id="articlePaper" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 min-h-[500px]">
+          <p class="text-gray-400 text-center py-20">載入文章中...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 單字庫頁面 -->
+  <main id="vocabView" class="max-w-4xl w-full mx-auto px-4 py-6 flex-1 hidden">
+    <div class="bg-white rounded-2xl shadow-sm border p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-6 border-b pb-4">
+        <div>
+          <h2 class="text-xl font-bold text-emerald-900">📖 我的專屬單字庫</h2>
+          <p class="text-sm text-gray-500">點擊單字可聽發音，可隨時匯出成 Excel (CSV) 複習</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportCSV()" class="bg-emerald-700 hover:bg-emerald-600 text-white text-sm px-4 py-2 rounded-lg font-medium">
+            ⬇️ 匯出 CSV 檔
+          </button>
+          <button onclick="showView('reader')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-4 py-2 rounded-lg">
+            ← 返回閱讀
+          </button>
+        </div>
+      </div>
+      <div id="vocabList" class="divide-y"></div>
+    </div>
+  </main>
+
+  <!-- 點擊單字小卡片 (Modal) -->
+  <div id="wordPopup" class="fixed bottom-5 right-5 bg-white border-2 border-emerald-600 shadow-2xl rounded-2xl p-4 w-72 z-50 hidden">
+    <div class="flex justify-between items-start mb-1">
+      <h3 id="popupWord" class="text-xl font-bold text-emerald-900">word</h3>
+      <button onclick="closeWordPopup()" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+    </div>
+    <p id="popupMeaning" class="text-sm text-gray-700 mb-3 min-h-[24px]">解釋載入中...</p>
+    <div class="flex gap-2">
+      <button onclick="speakWord()" class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 py-1.5 rounded-lg text-sm font-medium">
+        🔊 發音
+      </button>
+      <button onclick="saveCurrentWord()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-emerald-950 py-1.5 rounded-lg text-sm font-bold">
+        ＋ 收藏單字
+      </button>
+    </div>
+  </div>
+
+  <!-- 手動匯入新文章視窗 -->
+  <div id="importModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-lg font-bold text-emerald-900">＋ 手動匯入新文章 (JSON)</h3>
+        <button onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+      </div>
+      <p class="text-xs text-gray-600 mb-3">將請 AI 轉換好的文章 JSON 代碼貼在下方，即可永久收藏到你的瀏覽器閱讀清單中：</p>
+      <textarea id="importJsonInput" rows="8" class="w-full border rounded-xl p-3 text-xs font-mono bg-gray-50 focus:outline-emerald-600" placeholder='請貼上 { "title_en": "...", ... } 格式的 JSON 代碼'></textarea>
+      <div class="flex justify-end gap-2 mt-4">
+        <button onclick="closeImportModal()" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+        <button onclick="handleImport()" class="px-4 py-2 text-sm bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg font-bold">確認匯入</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allArticles = [];
+    let currentCategory = '全部';
+    let currentArticle = null;
+    let currentLevel = 'B1';
+    let showTranslation = true;
+    let speechRate = 1.0;
+    let selectedWord = { word: '', meaning: '' };
+    let savedVocab = JSON.parse(localStorage.getItem('eco_vocab') || '[]');
+
+    async function init() {
+      updateVocabCount();
+      let remoteArticles = [];
+      try {
+        const res = await fetch('articles.json?t=' + Date.now());
+        if (res.ok) remoteArticles = await res.json();
+      } catch (e) { console.log('讀取遠端文章失敗', e); }
+      const localArticles = JSON.parse(localStorage.getItem('eco_custom_articles') || '[]');
+      allArticles = [...localArticles, ...remoteArticles];
+      renderArticleList();
+      if (allArticles.length > 0) selectArticle(allArticles[0]);
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        if ((cat === '全部' && btn.textContent.includes('全部')) || btn.textContent === cat) {
+          btn.className = 'cat-btn bg-emerald-700 text-white px-3 py-1.5 rounded-full text-sm font-medium';
+        } else {
+          btn.className = 'cat-btn bg-white text-gray-700 hover:bg-emerald-50 px-3 py-1.5 rounded-full text-sm border';
+        }
+      });
+      renderArticleList();
+    }
+
+    function renderArticleList() {
+      const listEl = document.getElementById('articleList');
+      const filtered = currentCategory === '全部' ? allArticles : allArticles.filter(a => a.category === currentCategory);
+      document.getElementById('articleCount').textContent = filtered.length;
+      listEl.innerHTML = filtered.map(art => `
+        <div onclick='selectArticleById("${art.id}")' class="p-3.5 rounded-xl border cursor-pointer transition ${currentArticle && currentArticle.id === art.id ? 'bg-emerald-50 border-emerald-500 shadow-sm' : 'bg-white hover:border-emerald-300'}">
+          <div class="flex items-center justify-between text-xs text-gray-500 mb-1">
+            <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-medium">${art.category}</span>
+            <span>${art.source} · ${art.date}</span>
+          </div>
+          <h3 class="font-bold text-gray-800 text-sm line-clamp-2">${art.title_en}</h3>
+          <p class="text-xs text-gray-500 mt-1 line-clamp-1">${art.title_zh}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectArticleById(id) {
+      const found = allArticles.find(a => a.id === id);
+      if (found) selectArticle(found);
+    }
+
+    function selectArticle(art) {
+      currentArticle = art;
+      renderArticleList();
+      renderPaper();
+    }
+
+    function renderPaper() {
+      if (!currentArticle) return;
+      const paper = document.getElementById('articlePaper');
+      const levelData = currentArticle.levels[currentLevel] || currentArticle.levels['B1'];
+      const sentencesHtml = levelData.sentences.map((s, idx) => {
+        const wordsHtml = s.en.split(/(\s+)/).map(part => {
+          const clean = part.replace(/[^a-zA-Z'-]/g, '').toLowerCase();
+          if (clean.length > 0) {
+            return `<span class="word-btn" onclick="lookupWord('${clean}')">${part}</span>`;
+          }
+          return part;
+        }).join('');
+
+        return `
+          <div id="sent-${idx}" class="py-3 border-b border-gray-100 last:border-0 transition-all rounded">
+            <div class="flex items-start gap-3">
