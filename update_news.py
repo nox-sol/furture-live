@@ -69,8 +69,10 @@ JSON 輸出格式範例：
   }}
 }}
 """
+    available = [m.name for m in client.models.list() if "flash" in m.name.lower()]
+    chosen_model = available[0] if available else "gemini-2.0-flash"
     response = client.models.generate_content(
-        model="gemini-3.0-flash",
+        model=chosen_model,
         contents=prompt,
     )
     text = response.text.strip()
