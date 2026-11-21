@@ -3,58 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EcoRead Daily｜每日永續英文閱讀</title>
+  <title>EcoRead Daily｜永續英文閱讀與跟讀工作台</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background-color: #f0f5f2; color: #1f2937; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif; line-height: 1.6; }
     header { background-color: #065f46; color: white; padding: 14px 20px; position: sticky; top: 0; z-index: 30; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-    .header-inner { max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+    .header-inner { max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
     .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
     .brand h1 { font-size: 20px; font-weight: 700; }
     .brand p { font-size: 12px; color: #a7f3d0; }
-    .nav-btns { display: flex; gap: 8px; }
+    .nav-btns { display: flex; flex-wrap: wrap; gap: 8px; }
     button { cursor: pointer; border: none; border-radius: 8px; font-family: inherit; transition: 0.15s; }
     .btn-import { background-color: #059669; color: white; padding: 8px 14px; font-size: 14px; font-weight: 500; }
     .btn-import:hover { background-color: #10b981; }
     .btn-vocab { background-color: #f59e0b; color: #064e3b; padding: 8px 14px; font-size: 14px; font-weight: 700; }
     .btn-vocab:hover { background-color: #fbbf24; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
-    .cat-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .container { max-width: 1120px; margin: 0 auto; padding: 22px 16px; }
+    .filter-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .cat-bar { display: flex; flex-wrap: wrap; gap: 8px; }
     .cat-btn { background: white; color: #374151; border: 1px solid #d1d5db; padding: 6px 14px; border-radius: 20px; font-size: 13px; }
     .cat-btn.active { background: #047857; color: white; border-color: #047857; font-weight: 600; }
-    .layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+    .layout { display: grid; grid-template-columns: 320px 1fr; gap: 22px; align-items: start; }
     @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } }
     .sidebar-title { font-size: 13px; font-weight: 700; color: #6b7280; margin-bottom: 10px; }
     .article-list { display: flex; flex-direction: column; gap: 10px; max-height: 75vh; overflow-y: auto; }
-    .art-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; cursor: pointer; }
+    .art-card { position: relative; background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; cursor: pointer; }
     .art-card:hover { border-color: #34d399; }
     .art-card.active { background: #ecfdf5; border: 2px solid #10b981; }
-    .art-meta { display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; margin-bottom: 6px; }
+    .art-card.is-read { opacity: 0.72; }
+    .read-badge { position: absolute; top: 10px; right: 10px; background: #d1fae5; color: #065f46; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+    .art-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; font-size: 11px; color: #6b7280; margin-bottom: 6px; padding-right: 48px; }
     .tag { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
     .art-card h3 { font-size: 14px; color: #111827; margin-bottom: 4px; }
     .art-card p { font-size: 12px; color: #6b7280; }
-    .paper { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; min-height: 500px; }
-    .paper-header { border-bottom: 1px solid #e5e7eb; padding-bottom: 16px; margin-bottom: 18px; }
+    .paper { background: white; border-radius: 16px; padding: 26px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; min-height: 500px; }
+    .paper-header { border-bottom: 1px solid #e5e7eb; padding-bottom: 14px; margin-bottom: 16px; }
     .paper-header h2 { font-size: 22px; color: #111827; margin: 8px 0 4px; line-height: 1.35; }
     .paper-header .zh-title { font-size: 15px; color: #4b5563; }
-    .controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #f9fafb; padding: 10px 14px; border-radius: 10px; margin-bottom: 20px; }
-    .lvl-group, .tool-group { display: flex; align-items: center; gap: 6px; }
+    .controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; background: #f9fafb; padding: 10px 14px; border-radius: 10px; margin-bottom: 18px; }
+    .lvl-group, .tool-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
     .lvl-btn { background: white; border: 1px solid #d1d5db; padding: 5px 12px; font-size: 13px; font-weight: 700; color: #4b5563; }
     .lvl-btn.active { background: #047857; color: white; border-color: #047857; }
     .tool-btn { background: white; border: 1px solid #d1d5db; padding: 5px 10px; font-size: 12px; color: #374151; }
-    .sentence-row { padding: 14px 8px; border-bottom: 1px solid #f3f4f6; display: flex; gap: 12px; align-items: flex-start; border-radius: 8px; }
+    .tool-btn.active-mode { background: #065f46; color: white; border-color: #065f46; font-weight: 600; }
+    .sentence-row { padding: 14px 10px; border-bottom: 1px solid #f3f4f6; display: flex; gap: 10px; align-items: flex-start; border-radius: 8px; }
     .sentence-active { background: #ecfdf5; border-left: 4px solid #10b981; }
-    .speak-btn { width: 32px; height: 32px; border-radius: 50%; background: #d1fae5; color: #065f46; flex-shrink: 0; font-size: 14px; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+    .mini-ctrl-group { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .speak-btn { width: 32px; height: 32px; border-radius: 50%; background: #d1fae5; color: #065f46; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+    .mini-btn { padding: 3px 6px; font-size: 11px; background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
+    .mini-btn.on { background: #fef3c7; color: #92400e; border-color: #f59e0b; font-weight: 700; }
     .en-text { font-size: 18px; font-family: Georgia, serif; color: #1f2937; line-height: 1.65; }
     .zh-text { font-size: 14px; color: #6b7280; margin-top: 4px; }
+    .blind-box { background: #f3f4f6; border: 1px dashed #9ca3af; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #4b5563; display: inline-flex; align-items: center; gap: 8px; }
     .word-btn { cursor: pointer; border-radius: 4px; padding: 0 2px; }
     .word-btn:hover { background-color: #a7f3d0; color: #064e3b; }
+    .core-section { margin-top: 28px; padding-top: 20px; border-top: 2px solid #e5e7eb; }
+    .core-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+    .note-input { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 6px 10px; font-size: 13px; margin-top: 8px; background: white; }
+    .footer-actions { margin-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
     .hidden { display: none !important; }
-    .popup { position: fixed; bottom: 20px; right: 20px; background: white; border: 2px solid #059669; border-radius: 16px; padding: 16px; width: 280px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 50; }
+    .popup { position: fixed; bottom: 20px; right: 20px; background: white; border: 2px solid #059669; border-radius: 16px; padding: 16px; width: 310px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 50; }
     .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
-    .modal-box { background: white; border-radius: 16px; max-width: 500px; width: 100%; padding: 24px; }
+    .modal-box { background: white; border-radius: 16px; max-width: 540px; width: 100%; padding: 24px; max-height: 90vh; overflow-y: auto; }
     textarea { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px; font-family: monospace; font-size: 12px; margin-top: 8px; }
-    .vocab-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+    .vocab-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f3f4f6; }
+    .srs-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px; }
+    .srs-btn { padding: 10px 6px; font-size: 12px; font-weight: 700; border: 1px solid #d1d5db; background: white; }
+    @media (max-width: 600px) { .srs-bar { grid-template-columns: repeat(2, 1fr); } }
   </style>
 </head>
 <body>
@@ -65,28 +80,36 @@
         <span style="font-size:28px;">🌱</span>
         <div>
           <h1>EcoRead Daily</h1>
-          <p>每日永續與氣候變遷英文閱讀</p>
+          <p>永續英文閱讀・影子跟讀・間隔複習</p>
         </div>
       </div>
       <div class="nav-btns">
-        <button class="btn-import" onclick="openImportModal()">＋ 匯入新文章</button>
-        <button class="btn-vocab" onclick="showView('vocab')">📖 我的單字庫 (<span id="vocabCount">0</span>)</button>
+        <button class="btn-import" onclick="openImportModal()">✨ 自訂匯入</button>
+        <button class="btn-vocab" onclick="showView('vocab')">
+          ⭐ 我的單字庫 (<span id="vocabCount">0</span>) · 今日 <span id="dueCount">0</span>
+        </button>
       </div>
     </div>
   </header>
 
   <main id="readerView" class="container">
-    <div class="cat-bar" id="categoryTabs">
-      <button class="cat-btn active" onclick="setCategory('全部')">全部主題</button>
-      <button class="cat-btn" onclick="setCategory('氣候變遷與環境現況')">氣候變遷與環境現況</button>
-      <button class="cat-btn" onclick="setCategory('永續生活與環保行動')">永續生活與環保行動</button>
-      <button class="cat-btn" onclick="setCategory('國家政策與能源挑戰')">國家政策與能源挑戰</button>
-      <button class="cat-btn" onclick="setCategory('綠色能源與環保科技')">綠色能源與環保科技</button>
+    <div class="filter-bar">
+      <div class="cat-bar" id="categoryTabs">
+        <button class="cat-btn active" onclick="setCategory('全部')">全部文章</button>
+        <button class="cat-btn" onclick="setCategory('氣候變遷與環境現況')">🌍 氣候與環境</button>
+        <button class="cat-btn" onclick="setCategory('永續生活與環保行動')">🌱 永續生活</button>
+        <button class="cat-btn" onclick="setCategory('國家政策與能源挑戰')">⚡ 能源與政策</button>
+        <button class="cat-btn" onclick="setCategory('綠色能源與環保科技')">💡 綠能科技</button>
+      </div>
+      <div class="tool-group">
+        <button id="hideReadBtn" class="tool-btn" onclick="toggleHideRead()">🙈 隱藏已讀</button>
+        <button id="blindGlobalBtn" class="tool-btn" onclick="toggleBlindMode()">🎧 盲聽模式</button>
+      </div>
     </div>
 
     <div class="layout">
       <div>
-        <div class="sidebar-title">每日精選報導 (<span id="articleCount">0</span>)</div>
+        <div class="sidebar-title">文章清單 (<span id="articleCount">0</span>)</div>
         <div id="articleList" class="article-list"></div>
       </div>
       <div id="articlePaper" class="paper">
@@ -97,40 +120,72 @@
 
   <main id="vocabView" class="container hidden">
     <div class="paper">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e7eb; padding-bottom:14px; margin-bottom:16px;">
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid #e5e7eb; padding-bottom:14px; margin-bottom:16px;">
         <div>
-          <h2 style="color:#065f46;">📖 我的專屬單字庫</h2>
-          <p style="font-size:13px; color:#6b7280;">點擊單字可聽發音，可隨時匯出成 Excel (CSV) 複習</p>
+          <h2 style="color:#065f46;">⭐ 我的專屬單字庫</h2>
+          <p style="font-size:13px; color:#6b7280;">今日待複習：<strong id="dueSummaryText">0</strong> 個單字（支援原句挖空與 4 級間隔排程）</p>
         </div>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button class="btn-vocab" onclick="startQuiz()">🧠 開始複習測驗</button>
           <button class="btn-import" onclick="exportCSV()">⬇️ 匯出 CSV</button>
           <button class="tool-btn" onclick="showView('reader')">← 返回閱讀</button>
         </div>
       </div>
+
+      <div id="quizBox" class="hidden" style="background:#ecfdf5; border:1px solid #6ee7b7; border-radius:14px; padding:18px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <strong style="color:#065f46;">🧠 間隔重複測驗（第 <span id="quizIdx">1</span> / <span id="quizTotal">0</span> 題）</strong>
+          <button class="tool-btn" onclick="stopQuiz()">結束測驗</button>
+        </div>
+        <p style="font-size:12px; color:#047857; margin-bottom:6px;">來源文章：<span id="quizSource"></span></p>
+        <p id="quizCloze" style="font-size:17px; font-family:Georgia,serif; color:#111827; margin-bottom:10px;"></p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <button class="tool-btn" onclick="speakQuizWord()">🔊 聽單字</button>
+          <button id="revealQuizBtn" class="btn-import" onclick="revealQuizAnswer()">👁️ 顯示答案與解釋</button>
+        </div>
+        <div id="quizAnswerArea" class="hidden" style="background:white; border-radius:10px; padding:12px; border:1px solid #d1d5db;">
+          <p style="font-size:18px; font-weight:700; color:#065f46;" id="quizAnsWord"></p>
+          <p style="font-size:14px; color:#374151; margin-top:4px;" id="quizAnsMeaning"></p>
+          <p style="font-size:12px; color:#6b7280; margin-top:6px;" id="quizAnsNote"></p>
+          <div class="srs-bar">
+            <button class="srs-btn" style="color:#dc2626;" onclick="rateQuiz(1)">1. 忘了（明天重來）</button>
+            <button class="srs-btn" style="color:#d97706;" onclick="rateQuiz(2)">2. 想很久（+1天）</button>
+            <button class="srs-btn" style="color:#059669;" onclick="rateQuiz(3)">3. 順利答對（拉長）</button>
+            <button class="srs-btn" style="color:#065f46;" onclick="rateQuiz(4)">4. 秒答/會造句</button>
+          </div>
+        </div>
+      </div>
+
       <div id="vocabList"></div>
     </div>
   </main>
 
+  <!-- 點單字彈窗：先看例句提示，按一下才看中文 -->
   <div id="wordPopup" class="popup hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
       <strong id="popupWord" style="font-size:20px; color:#065f46;">word</strong>
       <button onclick="closeWordPopup()" style="background:none; font-size:16px; color:#9ca3af;">✕</button>
     </div>
-    <p id="popupMeaning" style="font-size:14px; color:#374151; margin-bottom:12px;">解釋載入中...</p>
-    <div style="display:flex; gap:8px;">
-      <button onclick="speakWord()" style="flex:1; background:#d1fae5; color:#065f46; padding:7px; font-weight:600;">🔊 發音</button>
-      <button onclick="saveCurrentWord()" style="flex:1; background:#f59e0b; color:#064e3b; padding:7px; font-weight:700;">＋ 收藏</button>
+    <p id="popupCloze" style="font-size:12px; color:#4b5563; background:#f9fafb; padding:8px; border-radius:8px; margin-bottom:10px;"></p>
+    <div id="popupMeaningBox" class="hidden" style="margin-bottom:10px;">
+      <p id="popupMeaning" style="font-size:14px; color:#111827; font-weight:600;"></p>
+    </div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <button onclick="speakWord()" style="flex:1; background:#d1fae5; color:#065f46; padding:7px; font-weight:600; font-size:12px;">🔊 發音</button>
+      <button id="revealMeaningBtn" onclick="revealPopupMeaning()" style="flex:1; background:#e5e7eb; color:#1f2937; padding:7px; font-weight:600; font-size:12px;">💡 看中文</button>
+      <button onclick="saveCurrentWord()" style="flex:1; background:#f59e0b; color:#064e3b; padding:7px; font-weight:700; font-size:12px;">⭐ 收藏</button>
     </div>
   </div>
 
+  <!-- 手動匯入 Modal -->
   <div id="importModal" class="modal-bg hidden">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="color:#065f46;">＋ 手動匯入新文章 (JSON)</h3>
+        <h3 style="color:#065f46;">✨ 自訂教材匯入（JSON）</h3>
         <button onclick="closeImportModal()" style="background:none; font-size:16px;">✕</button>
       </div>
-      <p style="font-size:12px; color:#6b7280; margin-top:4px;">將請 AI 轉換好的文章 JSON 代碼貼在下方，即可永久收藏到閱讀清單中：</p>
-      <textarea id="importJsonInput" rows="8" placeholder='請貼上 { "title_en": "...", ... } 格式的 JSON 代碼'></textarea>
+      <p style="font-size:12px; color:#6b7280; margin-top:4px;">將 AI 轉換好的文章 JSON 貼在下方，即可存入個人閱讀清單（零付費 API）：</p>
+      <textarea id="importJsonInput" rows="9" placeholder='請貼上 { "title_en": "...", ... } 格式的 JSON 代碼'></textarea>
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
         <button class="tool-btn" onclick="closeImportModal()">取消</button>
         <button class="btn-import" onclick="handleImport()">確認匯入</button>
@@ -139,17 +194,33 @@
   </div>
 
   <script>
+    const TODAY = () => new Date().toISOString().slice(0, 10);
     let allArticles = [];
     let currentCategory = '全部';
     let currentArticle = null;
     let currentLevel = 'B1';
     let showTranslation = true;
+    let blindMode = false;
+    let revealedSentences = new Set();
+    let hideReadArticles = false;
     let speechRate = 1.0;
-    let selectedWord = { word: '', meaning: '' };
+    let loopSentenceIdx = null;
+    let loopTimer = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let lastRecordingUrl = null;
+    let selectedWord = { word: '', meaning: '', sentence: '' };
+
     let savedVocab = JSON.parse(localStorage.getItem('eco_vocab') || '[]');
+    let readArticleIds = new Set(JSON.parse(localStorage.getItem('eco_read_articles') || '[]'));
+    let userNotes = JSON.parse(localStorage.getItem('eco_user_notes') || '{}');
+
+    let quizQueue = [];
+    let quizCursor = 0;
 
     async function init() {
-      updateVocabCount();
+      migrateVocab();
+      updateVocabStats();
       let remoteArticles = [];
       try {
         const res = await fetch('articles.json?t=' + Date.now());
@@ -158,37 +229,93 @@
       const localArticles = JSON.parse(localStorage.getItem('eco_custom_articles') || '[]');
       allArticles = localArticles.concat(remoteArticles);
       renderArticleList();
-      if (allArticles.length > 0) {
-        selectArticle(allArticles.at(0));
-           }
+      const visible = getFilteredArticles();
+      if (visible.length > 0) selectArticle(visible[0]);
+    }
+
+    function migrateVocab() {
+      let changed = false;
+      savedVocab = savedVocab.map(v => {
+        if (!v.nextReview) {
+          changed = true;
+          return { ...v, interval: 1, nextReview: TODAY(), sentence: v.sentence || '', note: v.note || '', sourceTitle: v.sourceTitle || '' };
+        }
+        return v;
+      });
+      if (changed) localStorage.setItem('eco_vocab', JSON.stringify(savedVocab));
+    }
+
+    function getDueVocab() {
+      const today = TODAY();
+      return savedVocab.filter(v => (v.nextReview || today) <= today);
+    }
+
+    function updateVocabStats() {
+      const due = getDueVocab().length;
+      document.getElementById('vocabCount').textContent = savedVocab.length;
+      document.getElementById('dueCount').textContent = due;
+      const sumEl = document.getElementById('dueSummaryText');
+      if (sumEl) sumEl.textContent = due;
     }
 
     function setCategory(cat) {
       currentCategory = cat;
+      const map = {
+        '全部': '全部文章',
+        '氣候變遷與環境現況': '氣候與環境',
+        '永續生活與環保行動': '永續生活',
+        '國家政策與能源挑戰': '能源與政策',
+        '綠色能源與環保科技': '綠能科技'
+      };
       document.querySelectorAll('.cat-btn').forEach(btn => {
-        if ((cat === '全部' && btn.textContent.includes('全部')) || btn.textContent === cat) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
+        btn.classList.toggle('active', btn.textContent.includes(map[cat]));
       });
       renderArticleList();
     }
 
+    function toggleHideRead() {
+      hideReadArticles = !hideReadArticles;
+      document.getElementById('hideReadBtn').classList.toggle('active-mode', hideReadArticles);
+      renderArticleList();
+    }
+
+    function toggleBlindMode() {
+      blindMode = !blindMode;
+      revealedSentences.clear();
+      document.getElementById('blindGlobalBtn').classList.toggle('active-mode', blindMode);
+      renderPaper();
+    }
+
+    function getFilteredArticles() {
+      return allArticles.filter(a => {
+        const matchCat = currentCategory === '全部' || a.category === currentCategory;
+        const matchRead = !hideReadArticles || !readArticleIds.has(a.id);
+        return matchCat && matchRead;
+      });
+    }
+
     function renderArticleList() {
       const listEl = document.getElementById('articleList');
-      const filtered = currentCategory === '全部' ? allArticles : allArticles.filter(a => a.category === currentCategory);
+      const filtered = getFilteredArticles();
       document.getElementById('articleCount').textContent = filtered.length;
-      listEl.innerHTML = filtered.map(art => `
-        <div onclick='selectArticleById("${art.id}")' class="art-card ${currentArticle && currentArticle.id === art.id ? 'active' : ''}">
-          <div class="art-meta">
-            <span class="tag">${art.category}</span>
-            <span>${art.source} · ${art.date}</span>
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<p style="font-size:13px; color:#6b7280; padding:12px;">目前沒有符合條件的文章。</p>';
+        return;
+      }
+      listEl.innerHTML = filtered.map(art => {
+        const isRead = readArticleIds.has(art.id);
+        return `
+          <div onclick='selectArticleById("${art.id}")' class="art-card ${currentArticle && currentArticle.id === art.id ? 'active' : ''} ${isRead ? 'is-read' : ''}">
+            ${isRead ? '<span class="read-badge">✓ 已讀</span>' : ''}
+            <div class="art-meta">
+              <span class="tag">${art.category}</span>
+              <span>${art.source} · ${art.date}</span>
+            </div>
+            <h3>${art.title_en}</h3>
+            <p>${art.title_zh}</p>
           </div>
-          <h3>${art.title_en}</h3>
-          <p>${art.title_zh}</p>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function selectArticleById(id) {
@@ -197,38 +324,103 @@
     }
 
     function selectArticle(art) {
+      stopLoop();
       currentArticle = art;
+      revealedSentences.clear();
       renderArticleList();
       renderPaper();
+    }
+
+    function pickCoreWords(art, levelSentences) {
+      const dict = art.dictionary || {};
+      const keys = Object.keys(dict);
+      const picked = [];
+      for (const w of keys) {
+        if (picked.length >= 5) break;
+        const matchSent = levelSentences.find(s => new RegExp(`\\b${w}\\b`, 'i').test(s.en));
+        picked.push({
+          word: w,
+          meaning: dict[w],
+          example: matchSent ? matchSent.en : ''
+        });
+      }
+      return picked;
     }
 
     function renderPaper() {
       if (!currentArticle) return;
       const paper = document.getElementById('articlePaper');
-      const levelData = currentArticle.levels[currentLevel] || currentArticle.levels['B1'];
-      const sentencesHtml = levelData.sentences.map((s, idx) => {
+      const levelData = currentArticle.levels[currentLevel] || currentArticle.levels['B1'] || { sentences: [] };
+      const sentences = levelData.sentences || [];
+
+      const sentencesHtml = sentences.map((s, idx) => {
+        const safeEn = s.en.replace(/`/g, "'").replace(/"/g, '&quot;');
+        const isHiddenByBlind = blindMode && !revealedSentences.has(idx);
+
         const wordsHtml = s.en.split(/(\s+)/).map(part => {
           const clean = part.replace(/[^a-zA-Z'-]/g, '').toLowerCase();
           if (clean.length > 0) {
-            return `<span class="word-btn" onclick="lookupWord('${clean}')">${part}</span>`;
+            return `<span class="word-btn" onclick="lookupWord('${clean}', \`${safeEn}\`)">${part}</span>`;
           }
           return part;
         }).join('');
 
+        const isLooping = loopSentenceIdx === idx;
+
         return `
-          <div id="sent-${idx}" class="sentence-row">
-            <button class="speak-btn" onclick="speakSentence(${idx}, \`${s.en.replace(/`/g, "'").replace(/"/g, '&quot;')}\`)" title="朗讀此句">🔊</button>
+          <div id="sent-${idx}" class="sentence-row ${isLooping ? 'sentence-active' : ''}">
+            <div class="mini-ctrl-group">
+              <button class="speak-btn" onclick="speakSentence(${idx}, \`${safeEn}\`, false)" title="朗讀此句">🔊</button>
+              <button class="mini-btn ${isLooping ? 'on' : ''}" onclick="toggleSentenceLoop(${idx}, \`${safeEn}\`)" title="單句循環（停頓2秒）">🔁</button>
+              <button class="mini-btn" onclick="recordFollowUp(${idx})" title="跟讀錄音 3 秒">🎙️</button>
+            </div>
             <div style="flex:1;">
-              <p class="en-text">${wordsHtml}</p>
-              ${showTranslation ? `<p class="zh-text">${s.zh}</p>` : ''}
+              ${isHiddenByBlind
+                ? `<div class="blind-box">
+                     <span>🎧 盲聽中：先聽發音再看文字</span>
+                     <button class="tool-btn" onclick="revealSentence(${idx})">👁️ 顯示此句</button>
+                   </div>`
+                : `<p class="en-text">${wordsHtml}</p>
+                   ${showTranslation ? `<p class="zh-text">${s.zh}</p>` : ''}`
+              }
+              <div id="recArea-${idx}" style="margin-top:6px;"></div>
             </div>
           </div>
         `;
       }).join('');
 
+      const coreWords = pickCoreWords(currentArticle, sentences);
+      const coreHtml = coreWords.length === 0 ? '' : `
+        <div class="core-section">
+          <h3 style="color:#065f46; font-size:17px;">🌱 本篇精選核心單字與個人造句</h3>
+          ${coreWords.map(item => {
+            const noteKey = `${currentArticle.id}_${item.word}`;
+            const savedNote = userNotes[noteKey] || '';
+            return `
+              <div class="core-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;">
+                  <div>
+                    <strong style="font-size:16px; color:#065f46;">${item.word}</strong>
+                    <span style="font-size:14px; color:#374151; margin-left:8px;">${item.meaning}</span>
+                  </div>
+                  <div style="display:flex; gap:6px;">
+                    <button class="tool-btn" onclick="speakSingle('${item.word}')">🔊</button>
+                    <button class="tool-btn" onclick="quickSaveCore('${item.word}', \`${item.meaning.replace(/`/g, "'").replace(/"/g, '&quot;')}\`, \`${item.example.replace(/`/g, "'").replace(/"/g, '&quot;')}\`)">⭐ 收藏</button>
+                  </div>
+                </div>
+                ${item.example ? `<p style="font-size:13px; color:#4b5563; font-family:Georgia,serif; margin-top:6px;">例句：${item.example}</p>` : ''}
+                <input class="note-input" type="text" value="${savedNote.replace(/"/g, '&quot;')}" placeholder="✍️ 寫下你的替換造句或記憶筆記（自動儲存）..." oninput="saveUserNote('${noteKey}', this.value)" />
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      const isRead = readArticleIds.has(currentArticle.id);
+
       paper.innerHTML = `
         <div class="paper-header">
-          <div style="display:flex; justify-content:space-between; font-size:12px; color:#6b7280;">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; font-size:12px; color:#6b7280;">
             <span class="tag">${currentArticle.category}</span>
             <span>來源：${currentArticle.source} ｜ 日期：${currentArticle.date}</span>
           </div>
@@ -246,18 +438,68 @@
           <div class="tool-group">
             <button onclick="toggleRate()" class="tool-btn">🐢 語速：${speechRate}x</button>
             <button onclick="toggleTrans()" class="tool-btn">${showTranslation ? '👁️ 隱藏中文' : '👁️ 顯示中文'}</button>
+            ${lastRecordingUrl ? `<button onclick="playABComparison()" class="tool-btn active-mode">▶ 原音 → 錄音對比</button>` : ''}
           </div>
         </div>
 
         <div>${sentencesHtml}</div>
+        ${coreHtml}
+
+        <div class="footer-actions">
+          <button class="btn-import" onclick="markAsRead('${currentArticle.id}')">
+            ${isRead ? '✅ 已標記為已讀' : '✅ 標記為已讀'}
+          </button>
+          <span style="font-size:12px; color:#6b7280;">點擊任意英文單字可先看原句提示再查中文</span>
+        </div>
       `;
     }
 
-    function setLevel(lvl) { currentLevel = lvl; renderPaper(); }
+    function revealSentence(idx) {
+      revealedSentences.add(idx);
+      renderPaper();
+    }
+
+    function setLevel(lvl) { stopLoop(); currentLevel = lvl; renderPaper(); }
     function toggleTrans() { showTranslation = !showTranslation; renderPaper(); }
     function toggleRate() { speechRate = speechRate === 1.0 ? 0.75 : 1.0; renderPaper(); }
 
-    function speakSentence(idx, text) {
+    function stopLoop() {
+      loopSentenceIdx = null;
+      if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+      window.speechSynthesis.cancel();
+    }
+
+    function toggleSentenceLoop(idx, text) {
+      if (loopSentenceIdx === idx) {
+        stopLoop();
+        renderPaper();
+        return;
+      }
+      stopLoop();
+      loopSentenceIdx = idx;
+      renderPaper();
+      runLoopCycle(idx, text);
+    }
+
+    function runLoopCycle(idx, text) {
+      if (loopSentenceIdx !== idx) return;
+      document.querySelectorAll('[id^="sent-"]').forEach(el => el.classList.remove('sentence-active'));
+      const el = document.getElementById('sent-' + idx);
+      if (el) el.classList.add('sentence-active');
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.rate = speechRate;
+      utter.onend = () => {
+        if (loopSentenceIdx !== idx) return;
+        loopTimer = setTimeout(() => {
+          if (loopSentenceIdx === idx) runLoopCycle(idx, text);
+        }, 2000);
+      };
+      window.speechSynthesis.speak(utter);
+    }
+
+    function speakSentence(idx, text, isFromCompare = false) {
+      if (!isFromCompare) stopLoop();
       window.speechSynthesis.cancel();
       document.querySelectorAll('[id^="sent-"]').forEach(el => el.classList.remove('sentence-active'));
       const el = document.getElementById('sent-' + idx);
@@ -269,76 +511,252 @@
       window.speechSynthesis.speak(utter);
     }
 
-    function lookupWord(word) {
-      const dict = (currentArticle && currentArticle.dictionary) || {};
-      const meaning = dict[word] || dict[word.replace(/s$/, '')] || dict[word.replace(/ed$/, '')] || dict[word.replace(/ing$/, '')] || '（點擊發音聽讀音，可加入單字庫複習）';
-      selectedWord = { word, meaning };
-      document.getElementById('popupWord').textContent = word;
-      document.getElementById('popupMeaning').textContent = meaning;
-      document.getElementById('wordPopup').classList.remove('hidden');
-      speakWord();
-    }
-
-    function closeWordPopup() { document.getElementById('wordPopup').classList.add('hidden'); }
-    function speakWord() {
-      if (!selectedWord.word) return;
+    function speakSingle(word) {
       window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(selectedWord.word);
+      const u = new SpeechSynthesisUtterance(word);
       u.lang = 'en-US';
       window.speechSynthesis.speak(u);
     }
 
-    function saveCurrentWord() {
-      if (!selectedWord.word) return;
-      if (!savedVocab.some(v => v.word === selectedWord.word)) {
-        savedVocab.unshift({ ...selectedWord, date: new Date().toISOString().slice(0, 10) });
+    async function recordFollowUp(idx) {
+      const area = document.getElementById('recArea-' + idx);
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (area) area.innerHTML = '<span style="font-size:12px; color:#dc2626;">此瀏覽器不支援麥克風錄音。</span>';
+        return;
+      }
+      try {
+        stopLoop();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+          lastRecordingUrl = URL.createObjectURL(blob);
+          stream.getTracks().forEach(t => t.stop());
+          renderPaper();
+          const newArea = document.getElementById('recArea-' + idx);
+          if (newArea) {
+            newArea.innerHTML = `
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:#ecfdf5; padding:6px 10px; border-radius:8px;">
+                <span style="font-size:12px; color:#065f46; font-weight:600;">🎙️ 已錄下跟讀：</span>
+                <audio controls src="${lastRecordingUrl}" style="height:28px;"></audio>
+                <button class="tool-btn" onclick="playABComparison(${idx})">▶ 原音 → 錄音</button>
+              </div>
+            `;
+          }
+        };
+        mediaRecorder.start();
+        if (area) area.innerHTML = '<span style="font-size:12px; color:#d97706; font-weight:700;">🔴 正在錄音（3 秒後自動停止，請開口跟讀）...</span>';
+        setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+        }, 3000);
+      } catch (err) {
+        if (area) area.innerHTML = '<span style="font-size:12px; color:#dc2626;">無法啟用麥克風，請確認瀏覽器權限。</span>';
+      }
+    }
+
+    function playABComparison(idx = 0) {
+      if (!lastRecordingUrl || !currentArticle) return;
+      const levelData = currentArticle.levels[currentLevel] || currentArticle.levels['B1'];
+      const sentObj = (levelData.sentences && levelData.sentences[idx]) || (levelData.sentences && levelData.sentences[0]);
+      window.speechSynthesis.cancel();
+      if (sentObj) {
+        const u = new SpeechSynthesisUtterance(sentObj.en);
+        u.lang = 'en-US';
+        u.rate = speechRate;
+        u.onend = () => {
+          const audio = new Audio(lastRecordingUrl);
+          audio.play();
+        };
+        window.speechSynthesis.speak(u);
+      } else {
+        new Audio(lastRecordingUrl).play();
+      }
+    }
+
+    function lookupWord(word, sentence = '') {
+      const dict = (currentArticle && currentArticle.dictionary) || {};
+      const meaning = dict[word] || dict[word.replace(/s$/, '')] || dict[word.replace(/ed$/, '')] || dict[word.replace(/ing$/, '')] || '（無內建解釋，可聽發音並加入單字庫補充）';
+      const cloze = sentence ? sentence.replace(new RegExp(`\\b${word}\\b`, 'gi'), '_____') : '';
+      selectedWord = { word, meaning, sentence };
+      document.getElementById('popupWord').textContent = word;
+      document.getElementById('popupCloze').textContent = cloze ? `語境提示：${cloze}` : '點擊下方按鈕聽發音或看中文';
+      document.getElementById('popupMeaning').textContent = meaning;
+      document.getElementById('popupMeaningBox').classList.add('hidden');
+      document.getElementById('wordPopup').classList.remove('hidden');
+      speakSingle(word);
+    }
+
+    function revealPopupMeaning() {
+      document.getElementById('popupMeaningBox').classList.remove('hidden');
+    }
+
+    function closeWordPopup() { document.getElementById('wordPopup').classList.add('hidden'); }
+    function speakWord() { speakSingle(selectedWord.word); }
+
+    function addWordToStorage(word, meaning, sentence = '') {
+      if (!word) return;
+      const exists = savedVocab.some(v => v.word === word);
+      if (!exists) {
+        savedVocab.unshift({
+          word,
+          meaning,
+          sentence,
+          note: '',
+          sourceTitle: currentArticle ? currentArticle.title_en : '',
+          date: TODAY(),
+          interval: 1,
+          nextReview: TODAY()
+        });
         localStorage.setItem('eco_vocab', JSON.stringify(savedVocab));
-        updateVocabCount();
-        alert(`已將「${selectedWord.word}」加入單字庫！`);
+        updateVocabStats();
+        alert(`已將「${word}」加入單字庫！`);
       } else {
         alert('這個單字已經在你的單字庫裡囉！');
       }
     }
 
-    function updateVocabCount() { document.getElementById('vocabCount').textContent = savedVocab.length; }
+    function saveCurrentWord() {
+      addWordToStorage(selectedWord.word, selectedWord.meaning, selectedWord.sentence);
+    }
+
+    function quickSaveCore(word, meaning, example) {
+      addWordToStorage(word, meaning, example);
+    }
+
+    function saveUserNote(key, val) {
+      userNotes[key] = val;
+      localStorage.setItem('eco_user_notes', JSON.stringify(userNotes));
+    }
+
+    function markAsRead(artId) {
+      readArticleIds.add(artId);
+      localStorage.setItem('eco_read_articles', JSON.stringify([...readArticleIds]));
+      renderArticleList();
+      renderPaper();
+    }
 
     function showView(view) {
+      stopLoop();
       document.getElementById('readerView').classList.toggle('hidden', view !== 'reader');
       document.getElementById('vocabView').classList.toggle('hidden', view !== 'vocab');
-      if (view === 'vocab') renderVocabList();
+      if (view === 'vocab') {
+        updateVocabStats();
+        renderVocabList();
+      }
     }
 
     function renderVocabList() {
       const container = document.getElementById('vocabList');
+      const today = TODAY();
       if (savedVocab.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:#9ca3af; padding:40px 0;">目前還沒有收藏任何單字，閱讀文章時點擊英文單字即可收藏！</p>';
         return;
       }
-      container.innerHTML = savedVocab.map((v, i) => `
-        <div class="vocab-item">
-          <div>
-            <strong style="font-size:17px; color:#065f46; margin-right:8px;">${v.word}</strong>
-            <span style="font-size:14px; color:#4b5563;">${v.meaning}</span>
+      container.innerHTML = savedVocab.map((v, i) => {
+        const isDue = (v.nextReview || today) <= today;
+        return `
+          <div class="vocab-item">
+            <div style="flex:1;">
+              <div>
+                <strong style="font-size:17px; color:#065f46; margin-right:8px;">${v.word}</strong>
+                <span style="font-size:14px; color:#374151;">${v.meaning}</span>
+                ${isDue ? '<span class="tag" style="background:#fef3c7; color:#92400e; margin-left:8px;">今日待複習</span>' : `<span style="font-size:11px; color:#6b7280; margin-left:8px;">下次：${v.nextReview || today}</span>`}
+              </div>
+              ${v.sentence ? `<p style="font-size:12px; color:#6b7280; margin-top:4px;">例句：${v.sentence}</p>` : ''}
+              ${v.sourceTitle ? `<p style="font-size:11px; color:#9ca3af; margin-top:2px;">來源：${v.sourceTitle}</p>` : ''}
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button onclick="speakSingle('${v.word}')" style="background:#d1fae5; color:#065f46; padding:4px 10px; font-size:12px;">🔊</button>
+              <button onclick="removeVocab(${i})" style="background:#fee2e2; color:#dc2626; padding:4px 10px; font-size:12px;">刪除</button>
+            </div>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button onclick="speechSynthesis.speak(Object.assign(new SpeechSynthesisUtterance('${v.word}'), {lang:'en-US'}))" style="background:#d1fae5; color:#065f46; padding:4px 10px; font-size:12px;">🔊</button>
-            <button onclick="removeVocab(${i})" style="background:#fee2e2; color:#dc2626; padding:4px 10px; font-size:12px;">刪除</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function removeVocab(idx) {
       savedVocab.splice(idx, 1);
       localStorage.setItem('eco_vocab', JSON.stringify(savedVocab));
-      updateVocabCount();
+      updateVocabStats();
       renderVocabList();
+    }
+
+    function startQuiz() {
+      const due = getDueVocab();
+      quizQueue = due.length > 0 ? [...due] : [...savedVocab];
+      if (quizQueue.length === 0) return alert('單字庫目前沒有單字可以測驗喔！');
+      quizCursor = 0;
+      document.getElementById('quizBox').classList.remove('hidden');
+      renderQuizItem();
+    }
+
+    function stopQuiz() {
+      document.getElementById('quizBox').classList.add('hidden');
+    }
+
+    function renderQuizItem() {
+      const item = quizQueue[quizCursor];
+      if (!item) {
+        alert('🎉 本輪複習測驗完成！');
+        stopQuiz();
+        updateVocabStats();
+        renderVocabList();
+        return;
+      }
+      document.getElementById('quizIdx').textContent = quizCursor + 1;
+      document.getElementById('quizTotal').textContent = quizQueue.length;
+      document.getElementById('quizSource').textContent = item.sourceTitle || '個人收藏';
+      const clozeText = item.sentence
+        ? item.sentence.replace(new RegExp(`\\b${item.word}\\b`, 'gi'), '【 ____ 】')
+        : `請回想單字：${item.word[0]}${'_'.repeat(Math.max(2, item.word.length - 1))}`;
+      document.getElementById('quizCloze').textContent = clozeText;
+      document.getElementById('quizAnsWord').textContent = item.word;
+      document.getElementById('quizAnsMeaning').textContent = item.meaning;
+      document.getElementById('quizAnsNote').textContent = item.note ? `你的造句筆記：${v.note}` : '';
+      document.getElementById('quizAnswerArea').classList.add('hidden');
+      speakSingle(item.word);
+    }
+
+    function speakQuizWord() {
+      const item = quizQueue[quizCursor];
+      if (item) speakSingle(item.word);
+    }
+
+    function revealQuizAnswer() {
+      document.getElementById('quizAnswerArea').classList.remove('hidden');
+    }
+
+    function rateQuiz(grade) {
+      const currentItem = quizQueue[quizCursor];
+      const idxInMain = savedVocab.findIndex(v => v.word === currentItem.word);
+      let nextInterval = 1;
+      const prevInterval = currentItem.interval || 1;
+      if (grade === 1) {
+        nextInterval = 1;
+        quizQueue.push(currentItem);
+      } else if (grade === 2) {
+        nextInterval = 1;
+      } else if (grade === 3) {
+        nextInterval = Math.max(2, Math.round(prevInterval * 2.5));
+      } else {
+        nextInterval = Math.max(4, Math.round(prevInterval * 3.5));
+      }
+      const nextDate = new Date(Date.now() + nextInterval * 86400000).toISOString().slice(0, 10);
+      if (idxInMain !== -1) {
+        savedVocab[idxInMain].interval = nextInterval;
+        savedVocab[idxInMain].nextReview = nextDate;
+        localStorage.setItem('eco_vocab', JSON.stringify(savedVocab));
+      }
+      quizCursor++;
+      renderQuizItem();
     }
 
     function exportCSV() {
       if (savedVocab.length === 0) return alert('單字庫目前是空的喔！');
-      const rows = [['單字', '中文解釋', '收藏日期'], ...savedVocab.map(v => [v.word, v.meaning, v.date])];
-      const csv = '\uFEFF' + rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+      const rows = [['單字', '中文解釋', '下次複習日', '收藏日期'], ...savedVocab.map(v => [v.word, v.meaning, v.nextReview || TODAY(), v.date])];
+      const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -355,7 +773,8 @@
         const obj = JSON.parse(raw);
         if (!obj.title_en || !obj.levels) throw new Error('格式不符');
         obj.id = 'custom_' + Date.now();
-        obj.date = obj.date || new Date().toISOString().slice(0, 10);
+        obj.date = obj.date || TODAY();
+        obj.source = obj.source || '自訂匯入';
         const localArticles = JSON.parse(localStorage.getItem('eco_custom_articles') || '[]');
         localArticles.unshift(obj);
         localStorage.setItem('eco_custom_articles', JSON.stringify(localArticles));
